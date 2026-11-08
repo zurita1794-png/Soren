@@ -7555,6 +7555,31 @@ async function ejecutarInterpretacion(
       ""
     );
 
+  // ========================================
+  // SOREN — CALENDAR V2
+  // ========================================
+
+  if (
+    process.env.SOREN_CALENDAR_V2_ENABLED === "true" &&
+    sorenCalendarRouter.puedeManejar(accion)
+  ) {
+
+    const fechas =
+      interpretacion?.data?.fechas;
+
+    if (
+      !Array.isArray(fechas) ||
+      fechas.length <= 1
+    ) {
+
+      return sorenCalendarRouter.ejecutar(
+        interpretacion
+      );
+
+    }
+
+  }
+
   switch (accion) {
 
     // ==================================
