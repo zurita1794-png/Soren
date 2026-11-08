@@ -1,7 +1,9 @@
 const http = require("http");
 
 const { crearRouterCalendario } = require("./src/calendar/calendar-router");
-
+const {
+  llamarAppsScriptCalendarioV2: clienteCalendarioV2
+} = require("./src/calendar/calendar-http-client");
 // ========================================
 // CONFIGURACIÓN
 // ========================================
@@ -1101,7 +1103,7 @@ async function llamarAppsScriptCalendarioV2(payload) {
 }
 
 const sorenCalendarRouter =
-  crearRouterCalendario(llamarAppsScriptCalendarioV2);
+  crearRouterCalendario(clienteCalendarioV2);
 
 // ========================================
 // GEMINI
