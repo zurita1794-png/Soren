@@ -112,3 +112,39 @@ jobs:
             process.exitCode = 1;
           });
           NODE
+
+      - name: Probar cliente y router Calendar V2
+        env:
+          SOREN_APPS_SCRIPT_TEST_URL: ${{ secrets.SOREN_APPS_SCRIPT_TEST_URL }}
+          SOREN_V2_APP_SECRET: ${{ secrets.SOREN_V2_APP_SECRET }}
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+
+          const { llamarAppsScriptCalendarioV2 } =
+            require('./src/calendar/calendar-http-client');
+
+          const { crearRouterCalendario } =
+            require('./src/calendar/calendar-router');
+
+          (async () => {
+            const router = crearRouterCalendario(
+              llamarAppsScriptCalendarioV2
+            );
+
+            const mensaje = await router.ejecutar({
+              accion: 'calendario_semana',
+              fecha: '2026-11-10'
+            });
+
+            assert.equal(typeof mensaje, 'string');
+            assert.match(mensaje, /Agenda semanal/);
+
+            console.log(
+              'Soren Calendar V2: cliente y router funcionando.'
+            );
+          })().catch(error => {
+            console.error(error.message);
+            process.exitCode = 1;
+          });
+          NODE
