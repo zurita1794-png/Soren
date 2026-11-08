@@ -1,0 +1,62 @@
+
+name: Verificar Soren Calendar V2
+
+on:
+  push:
+    branches:
+      - Soren-Calendar
+
+jobs:
+  verificar-calendario:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar sintaxis
+        run: |
+          node --check Index.js
+          node --check src/calendar/calendar-service.js
+          node --check src/calendar/calendar-handler.js
+          node --check src/calendar/calendar-router.js
+
+      - name: Probar módulos del calendario
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const { crearRouterCalendario } =
+            require('./src/calendar/calendar-router');
+
+          const router = crearRouterCalendario(
+            async () => ({
+              ok: true,
+              resultado: { eventos: [] }
+            })
+          );
+
+          (async () => {
+            assert.equal(
+              router.puedeManejar('calendario_ver'),
+              true
+            );
+
+            const respuesta = await router.ejecutar({
+              accion: 'calendario_ver'
+            });
+
+            assert.match(respuesta, /No encontré eventos/);
+
+            console.log(
+              'Soren Calendar V2: prueba correcta'
+            );
+          })().catch(error => {
+            console.error(error);
+            process.exitCode = 1;
+          });
+          NODE
