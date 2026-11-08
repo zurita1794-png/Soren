@@ -60,3 +60,55 @@ jobs:
             process.exitCode = 1;
           });
           NODE
+
+      - name: Probar conexion HTTP con Soren Calendar V2
+        env:
+          SOREN_APPS_SCRIPT_TEST_URL: ${{ secrets.SOREN_APPS_SCRIPT_TEST_URL }}
+          SOREN_V2_APP_SECRET: ${{ secrets.SOREN_V2_APP_SECRET }}
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+
+          (async () => {
+            const url = process.env.SOREN_APPS_SCRIPT_TEST_URL;
+            const secret = process.env.SOREN_V2_APP_SECRET;
+
+            assert.ok(url && url.endsWith('/exec'),
+              'Falta la URL de pruebas.');
+            assert.ok(secret, 'Falta el secreto V2.');
+
+            const respuesta = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                secret,
+                action: 'soren_calendar_week',
+                payload: { fecha: '2026-11-10' }
+              })
+            });
+
+            assert.equal(respuesta.status, 200,
+              'Error HTTP al conectar con Apps Script.');
+
+            const datos = await respuesta.json();
+
+            assert.equal(datos.ok, true,
+              datos.error || 'Apps Script rechazo la solicitud.');
+
+            assert.equal(datos.action, 'soren_calendar_week');
+            assert.ok(Array.isArray(datos.resultado?.eventos),
+              'La respuesta no contiene una lista de eventos.');
+
+            console.log(
+              'Soren Calendar V2: conexion HTTP exitosa.'
+            );
+            console.log(
+              'Eventos encontrados: ' + datos.resultado.eventos.length
+            );
+          })().catch(error => {
+            console.error(error.message);
+            process.exitCode = 1;
+          });
+          NODE
