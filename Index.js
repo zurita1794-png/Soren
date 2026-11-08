@@ -1068,39 +1068,7 @@ async function llamarAppsScript(
 // SOREN — CALENDAR V2
 // ========================================
 
-async function llamarAppsScriptCalendarioV2(payload) {
 
-  if (!SOREN_APPS_SCRIPT_TEST_URL || !SOREN_V2_APP_SECRET) {
-    throw new Error("Falta configurar la conexión de Soren Calendar V2.");
-  }
-
-  const respuesta = await fetch(SOREN_APPS_SCRIPT_TEST_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      secret: SOREN_V2_APP_SECRET,
-      ...payload
-    })
-  });
-
-  let datos;
-
-  try {
-    datos = await respuesta.json();
-  } catch (error) {
-    throw new Error("Apps Script V2 no devolvió un JSON válido.");
-  }
-
-  if (!respuesta.ok || datos?.ok !== true) {
-    throw new Error(
-      datos?.error || "Error comunicando con Soren Calendar V2."
-    );
-  }
-
-  return datos;
-}
 
 const sorenCalendarRouter =
   crearRouterCalendario(clienteCalendarioV2);
