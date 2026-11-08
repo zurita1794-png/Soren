@@ -1,5 +1,7 @@
 const http = require("http");
 
+const { crearRouterCalendario } = require("./src/calendar/calendar-router");
+
 // ========================================
 // CONFIGURACIÓN
 // ========================================
@@ -1055,6 +1057,14 @@ async function llamarAppsScript(
   return datos;
 
 }
+
+// ========================================
+// SOREN — CALENDAR V2
+// ========================================
+
+const sorenCalendarRouter =
+  crearRouterCalendario(llamarAppsScript);
+
 // ========================================
 // GEMINI
 // ========================================
